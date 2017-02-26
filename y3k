@@ -2,4 +2,4 @@
 import ynm3k.ynm3k
 
 if __name__ == '__main__':
-    yam3k.ynm3k.main()
+    ynm3k.ynm3k.main()
