@@ -28,6 +28,8 @@ def parse_args():
                         help="Attach to a interactive console.")
     parser.add_argument("--interact-path", default="/_y3k/interact",
                         help="The path for interactive console.")
+    parser.add_argument("--version", action='store_true', default=False,
+                        help="Show version and exit.")
 
     args = parser.parse_args()
     return args
@@ -35,6 +37,10 @@ def parse_args():
 
 def main():
     args = vars(parse_args())
+    if args['version']:
+        from . import __VERSION__
+        print("ynm3k %s" % __VERSION__)
+        return
     if args['echo']:
         from . import echo
         object_echo = echo.ModuleEcho(args['echo_prefix'])

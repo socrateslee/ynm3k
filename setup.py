@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+from ynm3k import __VERSION__
 
 sdict = {
     'name': 'ynm3k',
-    'version': "0.1.2",
+    'version': __VERSION__,
     'packages': ['ynm3k', 'ynm3k.contrib'],
     'scripts': ['y3k'],
     'zip_safe': False,
@@ -19,4 +20,5 @@ try:
 except ImportError:
     from distutils.core import setup
 
-setup(**sdict)
+if __name__ == '__main__':
+    setup(**sdict)
