@@ -140,7 +140,7 @@ class ModuleMock(object):
                                     headers=http_headers, timeout=http_timeout)
             ret['body'] = resp_obj.content
             ret['headers'] = dict([(k.lower(), v) for k, v in resp_obj.headers.items()\
-                                    if not is_hop_by_hop(k)])
+                                    if (not is_hop_by_hop(k)) and not k.lower() in ['content-length']])
             ret['status'] = resp_obj.status_code
             if ret['headers'].get('content-encoding') == 'gzip':
                 fileobj = six.BytesIO()
