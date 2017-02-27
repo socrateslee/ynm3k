@@ -6,7 +6,7 @@ sdict = {
     'packages': ['ynm3k', 'ynm3k.contrib'],
     'scripts': ['y3k'],
     'zip_safe': False,
-    'install_requires': ['requests'],
+    'install_requires': ['six', 'requests'],
     'author': 'Lichun',
     'classifiers': [
         'Environment :: Console',
