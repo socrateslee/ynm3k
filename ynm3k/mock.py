@@ -137,7 +137,7 @@ class ModuleMock(object):
             http_headers.update(req_spec.get('headers') or {})
             sess = session_pool.get_session()
             resp_obj = sess.request(http_method, url, params=http_params, data=http_body,
-                                    headers=http_headers, timeout=http_timeout)
+                                    headers=http_headers, timeout=http_timeout, allow_redirects=False)
             ret['body'] = resp_obj.content
             ret['headers'] = dict([(k.lower(), v) for k, v in resp_obj.headers.items()\
                                     if (not is_hop_by_hop(k)) and not k.lower() in ['content-length']])
