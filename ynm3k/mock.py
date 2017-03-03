@@ -1,6 +1,7 @@
 import copy
 import json
 import gzip
+import mimetypes
 import six
 import requests
 from . import util
@@ -120,6 +121,9 @@ class ModuleMock(object):
             ret['body'] = resp_spec.get('body') or ''
         elif resp_type == 'file':
             ret['body'] = open(resp_spec['body']).read()
+            mime_type, __ = mimetypes.guess_type(resp_spec['body'])
+            if mime_type:
+                ret['headers'] = {'content-type': mime_type}
         elif resp_type == 'remote':
             if req_spec['type'] == 'prefix':
                 pos = suffix.find(req_spec['path'])
