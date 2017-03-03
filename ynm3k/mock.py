@@ -157,6 +157,8 @@ class ModuleMock(object):
             ret['headers'].update(resp_spec['headers'])
         if not ret['headers'].get('content-type'):
             ret['headers']['content-type'] = 'text/plain'
+        ret['headers'] = {k.encode('utf-8') if isinstance(k, six.text_type) else k: v\
+                          for k, v in ret['headers'].items()}
         return bottle.HTTPResponse(**ret)
 
     def dispatch(self, suffix):
