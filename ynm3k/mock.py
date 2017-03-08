@@ -133,7 +133,7 @@ class ModuleMock(object):
             else:
                 raise ValueError("Unknown request type %s." % req_spec['type'])
 
-            http_params = '&'.join(["%s=%s" % (k, v) for (k, v) in bottle.request.query.items()])
+            http_params = bottle.request.query_string
             http_body = bottle.request.body.read()
             http_method = resp_spec.get('method') or bottle.request.method or 'GET'
             http_timeout = req_spec.get('timeout') or DEFAULT_TIMEOUT
