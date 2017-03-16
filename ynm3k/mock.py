@@ -156,6 +156,8 @@ class ModuleMock(object):
             raise ValueError("Unknown mock response type '%s'." % resp_type)
 
         ret['status'] = ret['status'] if 'status' in ret else 200
+        if 'status' in resp_spec:
+            ret['status'] = resp_spec['status']
         ret['headers'] = ret['headers'] if 'headers' in ret else {}
         if resp_spec.get('headers'):
             ret['headers'].update(resp_spec['headers'])
