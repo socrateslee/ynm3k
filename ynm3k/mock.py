@@ -1,7 +1,9 @@
+import re
 import copy
 import json
 import gzip
 import mimetypes
+from collections import defaultdict
 import six
 import requests
 from . import util
@@ -110,20 +112,20 @@ class ModuleMock(object):
 
     def get_mocked_response(self, suffix, req_spec, resp_spec):
         resp_type = resp_spec['type']
-        ret = {}
+        ret = {'headers': defaultdict(set)}
         if resp_type == 'content':
             body = resp_spec.get('body') or ''
             if isinstance(body, six.string_types):
                 ret['body'] = body
             else:
                 ret['body'] = json.dumps(body)
-                ret['headers'] = {'content-type': 'application/json'}
+                ret['headers']['content-type'] = 'application/json'
             ret['body'] = resp_spec.get('body') or ''
         elif resp_type == 'file':
             ret['body'] = open(resp_spec['body']).read()
             mime_type, __ = mimetypes.guess_type(resp_spec['body'])
             if mime_type:
-                ret['headers'] = {'content-type': mime_type}
+                ret['headers']['content-type'] = mime_type
         elif resp_type == 'remote':
             if req_spec['type'] == 'prefix':
                 pos = suffix.find(req_spec['path'])
@@ -143,10 +145,15 @@ class ModuleMock(object):
             resp_obj = sess.request(http_method, url, params=http_params, data=http_body,
                                     headers=http_headers, timeout=http_timeout, allow_redirects=False)
             ret['body'] = resp_obj.content
-            ret['headers'] = dict([(k.lower(), v) for k, v in resp_obj.headers.items()\
-                                    if (not is_hop_by_hop(k)) and not k.lower() in ['content-length']])
+            for k, v in resp_obj.headers.items():
+                if (not is_hop_by_hop(k)) and not k.lower() in ['content-length']:
+                    ret['headers'][k.lower()] = v
+            set_cookie = ret['headers'].pop('set-cookie', None)
+            if set_cookie:
+                ret['headers']['set-cookie'] =\
+                        set([i.strip() for i in re.split(r",(?![^=]+;)", set_cookie) if i.strip()])
             ret['status'] = resp_obj.status_code
-            if ret['headers'].get('content-encoding') == 'gzip':
+            if 'gzip' in ret['headers'].get('content-encoding', set()):
                 fileobj = six.BytesIO()
                 gzipper = gzip.GzipFile(fileobj=fileobj, mode='w')
                 gzipper.write(resp_obj.content)
@@ -158,13 +165,21 @@ class ModuleMock(object):
         ret['status'] = ret['status'] if 'status' in ret else 200
         if 'status' in resp_spec:
             ret['status'] = resp_spec['status']
-        ret['headers'] = ret['headers'] if 'headers' in ret else {}
-        if resp_spec.get('headers'):
-            ret['headers'].update(resp_spec['headers'])
+
         if not ret['headers'].get('content-type'):
             ret['headers']['content-type'] = 'text/plain'
-        ret['headers'] = {k.encode('utf-8') if isinstance(k, six.text_type) else k: v\
-                          for k, v in ret['headers'].items()}
+        if resp_spec.get('headers'):
+            ret['headers'].update(resp_spec['headers'])
+
+        headers_list = []
+        for k, v in ret['headers'].items():
+            k = k.encode('utf-8') if isinstance(k, six.text_type) else k
+            if type(v) is set:
+                for part in v:
+                    headers_list.append((k, part))
+            else:
+                headers_list.append((k, v))
+        ret['headers'] = headers_list
         return bottle.HTTPResponse(**ret)
 
     def dispatch(self, suffix):
