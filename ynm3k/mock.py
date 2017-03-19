@@ -148,6 +148,10 @@ class ModuleMock(object):
             for k, v in resp_obj.headers.items():
                 if (not is_hop_by_hop(k)) and not k.lower() in ['content-length']:
                     ret['headers'][k.lower()] = v
+            if ret['headers'].get('location'):
+                ret['headers']['location'] = util.replace_location_host(ret['headers']['location'],
+                                                                        url, bottle.request.urlparts.netloc)
+ 
             set_cookie = ret['headers'].pop('set-cookie', None)
             if set_cookie:
                 ret['headers']['set-cookie'] =\
