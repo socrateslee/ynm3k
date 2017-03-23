@@ -3,9 +3,11 @@ import copy
 import json
 import gzip
 import mimetypes
+import threading
 from collections import defaultdict
 import six
 import requests
+from requests.cookies import cookiejar_from_dict
 from . import util
 from .contrib import bottle
 from wsgiref.util import is_hop_by_hop
@@ -15,18 +17,15 @@ SESSION_POOL_SIZE = 10
 HTTP_METHODS = ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS')
 
 
-class SessionPool(object):
-    def __init__(self, size=None):
-        self.size = SESSION_POOL_SIZE if size is None else size
-        self.pool = [None] * self.size
+class SessionPool(threading.local):
+    def __init__(self):
+        self.sess = None
 
     def get_session(self):
-        user_agent = bottle.request.environ.get('HTTP_USER_AGENT') or ''
-        remote_addr = bottle.request.environ.get('REMOTE_ADDR') or ''
-        idx = hash("%s%s" % (user_agent, remote_addr)) % self.size
-        if not self.pool[idx]:
-            self.pool[idx] = requests.Session()
-        return self.pool[idx]
+        if not self.sess:
+            self.sess = requests.Session()
+        self.sess.cookies = cookiejar_from_dict({})
+        return self.sess
 
 session_pool = SessionPool()
 
