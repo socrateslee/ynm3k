@@ -9,6 +9,7 @@ import six
 import requests
 from requests.cookies import cookiejar_from_dict
 from . import util
+from . import handlers
 from .contrib import bottle
 from wsgiref.util import is_hop_by_hop
 
@@ -29,6 +30,36 @@ class SessionPool(threading.local):
 
 session_pool = SessionPool()
 
+
+def wrap_response(resp, resp_spec):
+    if isinstance(resp, six.string_types):
+        resp = {'body': resp,
+                'headers': {'content-type': 'text/html'}}
+    if isinstance(resp, dict):
+        if resp.get('headers'):
+            headers_list = []
+            for k, v in resp['headers'].items():
+                if type(v) is set:
+                    for part in v:
+                        headers_list.append((k, part))
+                else:
+                    headers_list.append((k, v))
+            resp['headers'] = headers_list
+        resp = bottle.HTTPResponse(**resp)
+
+    if isinstance(resp, bottle.HTTPResponse):
+        if resp_spec.get('status'):
+            resp.status = resp_spec['status']
+        if resp_spec.get('headers'):
+            headers = resp_spec['headers']
+            if isinstance(headers, dict):
+                headers = headers.items()
+            for k, v in headers:
+                resp.set_header(k, v)
+        return resp
+    else:
+        raise Exception("Unknown response type %s." % type(resp))   
+    
 
 class ModuleMock(object):
     def __init__(self, prefix, mock_file):
@@ -162,28 +193,14 @@ class ModuleMock(object):
                 gzipper.write(resp_obj.content)
                 gzipper.flush()
                 ret['body'] = fileobj.getvalue()
+        elif resp_type in handlers.HANDLERS:
+            handler_object = handlers.get_handler_object(req_spec, resp_spec,
+                                                         root_prefix=self.prefix)
+            pos = suffix.find(req_spec['path'])
+            ret = handler_object.dispatch(suffix[pos + len(req_spec['path']): ])
         else:
             raise ValueError("Unknown mock response type '%s'." % resp_type)
-
-        ret['status'] = ret['status'] if 'status' in ret else 200
-        if 'status' in resp_spec:
-            ret['status'] = resp_spec['status']
-
-        if not ret['headers'].get('content-type'):
-            ret['headers']['content-type'] = 'text/plain'
-        if resp_spec.get('headers'):
-            ret['headers'].update(resp_spec['headers'])
-
-        headers_list = []
-        for k, v in ret['headers'].items():
-            k = k.encode('utf-8') if isinstance(k, six.text_type) else k
-            if type(v) is set:
-                for part in v:
-                    headers_list.append((k, part))
-            else:
-                headers_list.append((k, v))
-        ret['headers'] = headers_list
-        return bottle.HTTPResponse(**ret)
+        return wrap_response(ret, resp_spec)
 
     def dispatch(self, suffix):
         mock_rule = self.get_req_mock_rule(suffix)
