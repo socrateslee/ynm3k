@@ -29,6 +29,19 @@ mock.json的一些例子如下所示:
   ["/", "http://192.168.1.10:8080/"]
 ]
 ```
+
+- 为每个请求增加一个特殊的header，比如设置X-Forwarded-For
+```
+[
+ [{"type": "prefix",
+   "path": "/",
+   "headers": {"X-Forwarded-For": "1.2.3.4"}},
+  {"type": "remote",
+   "url": "https://ifcfg.cn/"}
+ ]
+]
+```
+
 - 改写特殊的请求(POST /test这个请求的结果从文件test.json中返回)
 ```
 [
