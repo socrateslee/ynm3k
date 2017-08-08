@@ -42,7 +42,24 @@ mock.json的一些例子如下所示:
 ]
 ```
 
-- 改写特殊的请求(POST /test这个请求的结果从文件test.json中返回)
+- 为每个请求的response，增加一个特殊的header，比如设置Cache-Control
+
+```
+[
+   [
+      "/",
+      {
+         "type" : "remote",
+         "url" : "https://ifcfg.cn/",
+         "headers" : {
+            "Cache-Control" : "private"
+         }
+      }
+   ]
+]
+```
+
+- 改写特殊的请求(对于POST /test 这个请求，结果是文件test.json的内容)
 ```
 [
    [
