@@ -55,7 +55,7 @@ def wrap_response(resp, resp_spec):
             if isinstance(headers, dict):
                 headers = headers.items()
             for k, v in headers:
-                resp.set_header(k, v)
+                resp.set_header(k.encode('utf-8'), v)
         return resp
     else:
         raise Exception("Unknown response type %s." % type(resp))   
