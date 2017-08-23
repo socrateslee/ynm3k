@@ -49,7 +49,7 @@ class ModuleStatic(object):
         if (self.prefix + filename).endswith('/'):
             for suffix in self.try_files:
                 curr_filename = filename + suffix
-                curr_path = os.path.abspath(self.path) + os.sep + suffix
+                curr_path = os.path.abspath(self.path) + os.sep + curr_filename
                 if os.path.exists(curr_path):
                     ret = bottle.static_file(curr_filename, root=os.path.abspath(self.path))
                     break
