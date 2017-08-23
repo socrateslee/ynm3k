@@ -42,6 +42,16 @@ mock.json的一些例子如下所示:
 ]
 ```
 
+- 转发某个前缀下的请求到一个本地目录下，并且对于/prefix/dirname/这样的请求自动返回该目录下的index.html的内容
+```
+[
+    ["/prefix/", {"type": "static",
+                  "path": "examples/dir",
+                  "try_files": "index.html"}
+    ]
+]
+```
+
 - 为每个请求的response，增加一个特殊的header，比如设置Cache-Control
 
 ```

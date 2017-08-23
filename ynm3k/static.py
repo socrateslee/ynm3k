@@ -14,13 +14,18 @@ class ModuleStatic(object):
             prefix = '/'.join(i for i in [kw['root_prefix'].rstrip('/'), prefix] if i)
         path = resp_spec['path']
         serve_dir = resp_spec.get("serve_dir", False)
-        obj = cls(prefix, path, serve_dir=serve_dir, bind=False)
+        try_files = resp_spec.get("try_files")
+        obj = cls(prefix, path, serve_dir=serve_dir, try_files=try_files, bind=False)
         return obj
 
-    def __init__(self, prefix, path, serve_dir=False, bind=True):
+    def __init__(self, prefix, path, serve_dir=False, try_files=None, bind=True):
         self.prefix = util.format_prefix(prefix)
         self.path = path.rstrip('/') if path else '.'
         self.serve_dir = serve_dir
+        if not try_files:
+            try_files = []
+        try_files = try_files if isinstance(try_files, list) else [try_files]
+        self.try_files = try_files
         if bind:
             self.bind()
 
@@ -40,5 +45,14 @@ class ModuleStatic(object):
             output = '<br/>'.join(map(to_dir_line,
                                       os.listdir(abs_path)))
             return output
-        ret = bottle.static_file(filename, root=os.path.abspath(self.path))
+        ret = None
+        if (self.prefix + filename).endswith('/'):
+            for suffix in self.try_files:
+                curr_filename = filename + suffix
+                curr_path = os.path.abspath(self.path) + os.sep + suffix
+                if os.path.exists(curr_path):
+                    ret = bottle.static_file(curr_filename, root=os.path.abspath(self.path))
+                    break
+        if ret is None:
+            ret = bottle.static_file(filename, root=os.path.abspath(self.path))
         return ret
