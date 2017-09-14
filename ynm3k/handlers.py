@@ -10,6 +10,10 @@ HANDLERS = {
     'static': {
         'module': 'ynm3k.static',
         'cls': 'ModuleStatic'
+    },
+    'zip': {
+        'module': 'ynm3k.modules.zip_serve',
+        'cls': 'ModuleZipServe'
     }
 }
 

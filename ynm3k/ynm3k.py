@@ -21,9 +21,13 @@ def parse_args():
     parser.add_argument("--static", default="",
                         help="Serve static files with specified directory.")
     parser.add_argument("--static-prefix", default="/",
-                        help="The path prefix for static serving files.")
+                        help="The path prefix for serving static files with --static.")
     parser.add_argument("--static-serve-dir", action="store_true",
                         help="Serve directories as a list.")
+    parser.add_argument("--zip", default="",
+                        help="Serve a zip file as static directory.")
+    parser.add_argument("--zip-prefix", default="/",
+                        help="The path prefix for the serving file with --zip.")   
     parser.add_argument("--interact", action="store_true",
                         help="Attach to a interactive console.")
     parser.add_argument("--interact-path", default="/_y3k/interact",
@@ -52,6 +56,10 @@ def main():
         object_static = static.ModuleStatic(args['static_prefix'],
                                             path=args['static'],
                                             serve_dir=args['static_serve_dir'])
+    if args['zip']:
+        from .modules import zip_serve
+        object_zip = zip_serve.ModuleZipServe(args['zip_prefix'],
+                                              path=args['zip'])
     if args['mock']:
         from . import mock
         object_mock = mock.ModuleMock(args['mock_prefix'], args['mock'])
