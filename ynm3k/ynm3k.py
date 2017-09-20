@@ -32,9 +32,11 @@ def parse_args():
                         help="Attach to a interactive console.")
     parser.add_argument("--interact-path", default="/_y3k/interact",
                         help="The path for interactive console.")
+    parser.add_argument("--server", default="auto",
+                        help="Specify the web server for running ynm3k, "
+                        "options available at https://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend")
     parser.add_argument("--version", action='store_true', default=False,
                         help="Show version and exit.")
-
     args = parser.parse_args()
     return args
 
@@ -62,9 +64,9 @@ def main():
                                               path=args['zip'])
     if args['mock']:
         from . import mock
-        object_mock = mock.ModuleMock(args['mock_prefix'], args['mock'])
+        object_mock = mock.ModuleMock(args['mock_prefix'], args['mock'])    
     bottle.run(host=args['host'], port=int(args['port']),
-               debug=True)
+               debug=True, server=args["server"])
 
 
 if __name__ == '__main__':
