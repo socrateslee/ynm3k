@@ -12,7 +12,9 @@ except:
 sdict = {
     'name': 'ynm3k',
     'version': __VERSION__,
-    'packages': ['ynm3k', 'ynm3k.contrib'],
+    'packages': ['ynm3k',
+                 'ynm3k.contrib',
+                 'ynm3k.modules'],
     'scripts': ['y3k'],
     'zip_safe': False,
     'install_requires': ['six', 'requests'],
