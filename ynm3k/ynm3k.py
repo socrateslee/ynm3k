@@ -1,6 +1,7 @@
 import sys
 import argparse
 import importlib
+import six
 from .contrib import bottle
 
 
@@ -28,6 +29,8 @@ def parse_args():
                         help="Serve a zip file as static directory.")
     parser.add_argument("--zip-prefix", default="/",
                         help="The path prefix for the serving file with --zip.")   
+    parser.add_argument("--zip-encoding", default="utf-8",
+                        help="The encoding of zipfile")   
     parser.add_argument("--interact", action="store_true",
                         help="Attach to a interactive console.")
     parser.add_argument("--interact-path", default="/_y3k/interact",
@@ -61,7 +64,8 @@ def main():
     if args['zip']:
         from .modules import zip_serve
         object_zip = zip_serve.ModuleZipServe(args['zip_prefix'],
-                                              path=args['zip'])
+                                              args['zip'],
+                                              args['zip_encoding'])
     if args['mock']:
         from . import mock
         object_mock = mock.ModuleMock(args['mock_prefix'], args['mock'])    
@@ -70,4 +74,7 @@ def main():
 
 
 if __name__ == '__main__':
+    if six.PY2:
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
     main()
