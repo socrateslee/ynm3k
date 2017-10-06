@@ -1,6 +1,6 @@
 # ynm3k
 
-ynm3k取名自"[要你命3000](http://cn.uncyclopedia.wikia.com/index.php?title=%E8%A6%81%E4%BD%A0%E5%91%BD%E4%B8%89%E5%8D%83)"，目前的功能包括
+ynm3k([文档](https://ynm3k.readthedocs.io/))取名自"[要你命3000](http://cn.uncyclopedia.wikia.com/index.php?title=%E8%A6%81%E4%BD%A0%E5%91%BD%E4%B8%89%E5%8D%83)"，目前的功能包括
 
 - 一个通过完全通过json进行配置的mock调试/反向代理服务器
 - 一个静态文件服务器（除静态目录外，还可以服务zip文件）
