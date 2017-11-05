@@ -31,6 +31,26 @@ class SessionPool(threading.local):
 session_pool = SessionPool()
 
 
+def handle_op(resp, resp_spec):
+    '''
+    对resp_spec中的operations各种操作进行处理.
+    '''
+    operations = None
+    if isinstance(resp_spec.get('operations'), dict):
+        operations = [resp_spec.get('operations')]
+    elif isinstance(resp_spec.get('operations'), list):
+        operations = resp_spec.get('operations')
+    if not operations:
+        return resp
+    for op in operations:
+        if op['type'] == 'insert_adjacent_html' and 'text/html' in (resp.content_type or ''):
+            resp.body = util.dom_insert_adjacent_html(util.to_unicode(resp.body, resp.charset),
+                                                      op['selector'],
+                                                      op['position'],
+                                                      op['html'])
+    return resp
+
+
 def wrap_response(resp, resp_spec):
     if isinstance(resp, six.string_types):
         resp = {'body': resp,
@@ -56,6 +76,15 @@ def wrap_response(resp, resp_spec):
                 headers = headers.items()
             for k, v in headers:
                 resp.set_header(k.encode('utf-8'), v)
+        resp = handle_op(resp, resp_spec)
+
+        if 'gzip' in resp.headers.get('content-encoding', set()):
+            fileobj = six.BytesIO()
+            gzipper = gzip.GzipFile(fileobj=fileobj, mode='w')
+            gzipper.write(util.to_bytes(resp.body, encoding=resp.charset))
+            gzipper.flush()
+            resp.body = fileobj.getvalue()
+
         return resp
     else:
         raise Exception("Unknown response type %s." % type(resp))   
@@ -187,12 +216,6 @@ class ModuleMock(object):
                 ret['headers']['set-cookie'] =\
                         set([i.strip() for i in re.split(r",(?![^=]+;)", set_cookie) if i.strip()])
             ret['status'] = resp_obj.status_code
-            if 'gzip' in ret['headers'].get('content-encoding', set()):
-                fileobj = six.BytesIO()
-                gzipper = gzip.GzipFile(fileobj=fileobj, mode='w')
-                gzipper.write(resp_obj.content)
-                gzipper.flush()
-                ret['body'] = fileobj.getvalue()
         elif resp_type in handlers.HANDLERS:
             handler_object = handlers.get_handler_object(req_spec, resp_spec,
                                                          root_prefix=self.prefix)
