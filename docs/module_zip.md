@@ -2,10 +2,11 @@
 
 zip模块可以把一个zip文件作为一个静态的目录来服务。
 
-在--mock的config.json中，需要设置以下的参数:
+在通过--mock参数指定的config.json中，需要设置以下的参数:
 
 - __type__: type == 'zip'时，表示采用zip模块来提供相应。
 - __path__: zip文件的路径。
+- __encoding__: 可选，zip文件的编码，默认值为utf-8，对于一些文件名编码为gbk文件，可以指定这个参数为'gbk'.
 
 下面一个config.json的例子:
 

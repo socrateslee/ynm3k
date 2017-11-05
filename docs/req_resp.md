@@ -60,6 +60,7 @@ dict object方式的response spec，全部都可以支持的属性如下：
 - __type__: type属性是必须的，决定了response spec的返回响应的方式，也决定了这个dict object中，还需要配置哪些属性。
 - __headers__: headers属性可以是一个dict(比如 {"content-type": "application/json"})，或者是一个2-tuple的list(比如 [["content-type", "application/json"]])，用户在返回的响应中设置自定义的headers。
 - __status__: status属性是int类型的，可以设置一个http返回码，用于设置或者覆盖当前响应的http return code。
+- __operations__: 在返回响应之前，可以通过在operations这个参数中定义的操作对返回进行后处理，operations可以为一个dict object或者dict object组成的list，也就是说可以支持一次或者多次的后处理操作。本参数需要0.4.0版本以后的版本支持。
 
 ynm3k可以支持三种基本类型的response spec，即远程(remote)，内容(content)和文件(file)。在ynm3k中提供的其它module，一般既可以通过命令行的方式启动，也可以在response spec中，作为一种特殊的类型来生成响应。
 
@@ -76,3 +77,4 @@ ynm3k可以支持三种基本类型的response spec，即远程(remote)，内容
 
 - __static__: 以静态文件的方式，返回一个文件夹下的内容。
 - __zip__: 以静态文件的方式，返回一个zip包中的内容。 
+
