@@ -50,6 +50,8 @@ def concat_path(*parts):
 
 
 def to_unicode(content, encoding='utf-8'):
+    if hasattr(content, 'read'):
+        content = content.read()
     if not isinstance(content, six.text_type):
         content = content.decode(encoding, 'ignore')
     return content
