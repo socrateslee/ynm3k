@@ -48,6 +48,9 @@ def handle_op(resp, resp_spec):
                                                       op['selector'],
                                                       op['position'],
                                                       op['html'])
+            # Remove Content-Length headers in case of inconsistent length.
+            if 'Content-Length' in resp.headers:
+                del resp.headers['Content-Length']
     return resp
 
 
