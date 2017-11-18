@@ -1,3 +1,4 @@
+# coding: utf-8
 import re
 import copy
 import json
@@ -78,7 +79,7 @@ def wrap_response(resp, resp_spec):
             if isinstance(headers, dict):
                 headers = headers.items()
             for k, v in headers:
-                resp.set_header(k.encode('utf-8'), v)
+                resp.set_header(k, v)
         resp = handle_op(resp, resp_spec)
 
         if 'gzip' in resp.headers.get('content-encoding', set()):
