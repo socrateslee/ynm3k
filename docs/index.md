@@ -17,5 +17,7 @@ Contents
 * [对于response的个性化后处理](operations.md)
 * [静态文件服务，static模块](module_static.md)
 * [压缩文件服务，zip模块](module_zip.md)
+* [使用范例](use_case.md)
+* [FAQ](faq.md)
 
 ynm3k的github地址为[https://github.com/socrateslee/ynm3k](https://github.com/socrateslee/ynm3k)
