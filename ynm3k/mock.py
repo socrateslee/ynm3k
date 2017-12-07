@@ -2,6 +2,10 @@
 import re
 import copy
 import json
+try:
+    import hjson
+except ImportError:
+    import json as hjson
 import gzip
 import mimetypes
 import threading
@@ -110,7 +114,7 @@ class ModuleMock(object):
                                  method=HTTP_METHODS)(dispatch)
 
     def parse_mock_json(self, fd):
-        original = json.load(fd)
+        original = hjson.load(fd)
         result = []
         for req, resp in original:
             req_spec = {}

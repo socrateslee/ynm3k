@@ -1,6 +1,6 @@
 # 配置文件
 
-ynm3k可以通过--mock参数指定一个json格式的配置文件：
+ynm3k可以通过--mock参数指定一个json(ynm3k的最新版本默认采用[hjson](https://hjson.org)作为配置文件的格式，兼容标准的json，并且可以支持注释，多行字符串等功能)格式的配置文件：
 
 ```
 y3k --mock config.json

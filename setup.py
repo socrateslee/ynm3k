@@ -17,7 +17,7 @@ sdict = {
                  'ynm3k.modules'],
     'scripts': ['y3k'],
     'zip_safe': False,
-    'install_requires': ['six', 'requests'],
+    'install_requires': ['six', 'requests', 'hjson'],
     'author': 'Lichun',
     'long_description': long_description,
     'url': 'https://github.com/socrateslee/ynm3k',
