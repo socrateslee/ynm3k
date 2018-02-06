@@ -22,7 +22,7 @@ def format_prefix(prefix):
 def filter_request_headers(req):
     ret = [(k, v) for (k, v) in req.headers.items()\
            if not is_hop_by_hop(k)]
-    remove_headers = ['content-length', 'host']
+    remove_headers = ['content-length']
     ret = dict(filter(lambda x: x[0].lower() not in remove_headers,
                       ret))
     return ret
