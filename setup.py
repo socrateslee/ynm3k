@@ -18,6 +18,9 @@ sdict = {
     'scripts': ['y3k'],
     'zip_safe': False,
     'install_requires': ['six', 'requests', 'hjson'],
+    'extras_require': {
+        'full': ['bs4', 'paste']
+    },
     'author': 'Lichun',
     'long_description': long_description,
     'url': 'https://github.com/socrateslee/ynm3k',
