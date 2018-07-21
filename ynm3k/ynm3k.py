@@ -19,6 +19,8 @@ def parse_args():
                         help="Enable mocking data via a json file.")
     parser.add_argument("--mock-prefix", default="",
                         help="The path prefix for all mocking data.")
+    parser.add_argument("--mock-allow-host", default=False, action="store_true",
+                        help="Allow Host header to be passed into upstream servers.")
     parser.add_argument("--static", default="",
                         help="Serve static files with specified directory.")
     parser.add_argument("--static-prefix", default="/",
@@ -68,7 +70,8 @@ def main():
                                               args['zip_encoding'])
     if args['mock']:
         from . import mock
-        object_mock = mock.ModuleMock(args['mock_prefix'], args['mock'])    
+        object_mock = mock.ModuleMock(args['mock_prefix'], args['mock'],
+                                      allow_host=args['mock_allow_host'])
     bottle.run(host=args['host'], port=int(args['port']),
                debug=True, server=args["server"])
 

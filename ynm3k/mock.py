@@ -99,9 +99,10 @@ def wrap_response(resp, resp_spec):
     
 
 class ModuleMock(object):
-    def __init__(self, prefix, mock_file):
+    def __init__(self, prefix, mock_file, allow_host=False):
         self.prefix = util.format_prefix(prefix)
         self.mock = self.parse_mock_json(open(mock_file))
+        self.allow_host = allow_host
 
         def dispatch(suffix=''):
             if self.prefix == '' or self.prefix == '/':
@@ -206,7 +207,8 @@ class ModuleMock(object):
             http_body = bottle.request.body.read()
             http_method = resp_spec.get('method') or bottle.request.method or 'GET'
             http_timeout = req_spec.get('timeout') or DEFAULT_TIMEOUT
-            http_headers = {k.lower(): v for k, v in util.filter_request_headers(bottle.request).items()}
+            http_headers = {k.lower(): v for k, v in\
+                            util.filter_request_headers(bottle.request, allow_host=self.allow_host).items()}
             http_headers.update(req_spec.get('headers') or {})
             sess = session_pool.get_session()
             resp_obj = sess.request(http_method, url, params=http_params, data=http_body,
