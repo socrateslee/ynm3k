@@ -20,3 +20,21 @@
    ]
 ]
 ```
+
+
+## 通过设置http response status code为302，跳转至某一url
+
+```
+[
+  [
+    "/",
+    {
+      "type": "content",
+      "status": 302,
+      "headers": {
+        "Location": "https://valarmorghulis.io"
+      }
+    }
+  ]
+]
+```
