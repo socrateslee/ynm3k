@@ -7,6 +7,14 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+try:
+    import _thread as thread
+except ImportError:
+    import thread
+import threading
+import time
+import os
+import glob
 import six
 
 
@@ -93,3 +101,59 @@ def dom_insert_adjacent_html(dom_html, selector, position, html):
     for element in dom.select(selector):
         insert_adjacent_html(element, position, html)
     return str(dom)
+
+
+class GlobCheckerThread(threading.Thread):
+    '''
+    A thread to checking the change event of the given glob patterns.
+    '''
+    def __init__(self, glob_pattern, interval=1, callback=None):
+        threading.Thread.__init__(self)
+        self.glob_pattern = glob_pattern
+        self.interval = interval
+        if callback:
+            self.callback = callback
+        else:
+            def default_callback():
+                thread.interrupt_main()
+                return True
+            self.callback = default_callback
+        self.files = self._get_files()
+        self.event_changed = threading.Event()
+        self.event_exit = threading.Event()
+
+    def _get_files(self):
+        files = dict()
+        for path in glob.iglob(self.glob_pattern):
+            files[path] = os.stat(path).st_mtime
+        return files
+
+    def run(self):
+        try:
+            while not self.event_exit.is_set():
+                changed = False
+                new_files = self._get_files()
+                for path, mtime in self.files.items():
+                    if new_files.get(path) != mtime:
+                        changed = True
+                        break
+                if not changed:
+                    if set(new_files.keys()) - set(self.files.keys()):
+                        changed = True
+                if changed:
+                    self.event_changed.set()
+                    if self.callback():
+                        break
+                self.files = new_files
+                time.sleep(self.interval)
+        except KeyboardInterrupt as e:
+            print("KeyboardInterrupt in the glob checking loop.")
+        except Exception as e:
+            pass
+
+    def __enter__(self):
+        self.start()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.join()
+        return exc_type is not None and issubclass(exc_type, KeyboardInterrupt)

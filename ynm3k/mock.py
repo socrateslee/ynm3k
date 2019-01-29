@@ -101,7 +101,8 @@ def wrap_response(resp, resp_spec):
 class ModuleMock(object):
     def __init__(self, prefix, mock_file, allow_host=False):
         self.prefix = util.format_prefix(prefix)
-        self.mock = self.parse_mock_json(open(mock_file))
+        with open(mock_file) as fd:
+            self.mock = self.parse_mock_json(fd)
         self.allow_host = allow_host
 
         def dispatch(suffix=''):
